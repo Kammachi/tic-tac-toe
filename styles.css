@@ -1,0 +1,41 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: system-ui, "Segoe UI", Helvetica, Arial, 
+        sans-serif, "Apple Color Emoji", 
+        "Segoe UI Emoji", "Segoe UI Symbol";
+        
+
+    margin: 0;
+    padding: 0;
+    
+    background-color: black;
+    color: white;
+}
+
+main {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 40px;
+}
+
+.gameContainer {
+    width: 300px;
+    
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+
+    margin: 0 auto;
+    border: solid 2px white;
+}
+
+.gameSquare {
+    width: 100px;
+    height: 100px;
+
+    border: solid 2px white;
+}
