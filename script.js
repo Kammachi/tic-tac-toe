@@ -1,15 +1,14 @@
 const Game = (function () {
 
     const Gameboard = {
-        board: [['', 'X', ''], ['X', 'O', 'O'], ['', '', '']], 
+        board: [['', 'X', ''], ['X', 'O', 'O'], ['', '', '']],
 
         resetBoard: function() {
             this.board = [['', '', ''], ['', '', ''], ['', '', '']];
         },
-        
+
         checkWin: function() {
             board = this.board;
-            
 
             for (let i = 0; i < 3; i++) {
                 /* Check horizontally */
@@ -25,6 +24,8 @@ const Game = (function () {
                     return true;
                 }
             }
+
+            /* Check diagonally */
 
             if (["OOO", "XXX"].includes(
                 board[0][0] + board[1][1] + board[2][2]) || 
@@ -50,7 +51,7 @@ const Game = (function () {
                     gameContainer.appendChild(gameSquare);
                 }
             }
-        }
+        },  
     }
 
     const Players = {
@@ -59,22 +60,35 @@ const Game = (function () {
         createPlayer: function(name) {
             let score = 0;
 
-            this.players.push({name, score});
+            sign = this.players.length === 0 ? 'X' : 'O';
+
+            this.players.push({name, sign, score});
         },
 
         resetScore: function() {
-            for (const player in this.players) {
+            for (const player of this.players) {
                 player.score = 0;
             }
-        }
+        },
+
+        addScore: function(sign) {
+            for (let player of this.players) {
+                if (player.sign === sign) {
+                    player.score++;
+                    alert(`${player.name} wins`);
+                }
+            }
+        },
     }
 
-    
+    Players.createPlayer('player1');
+    Players.createPlayer('player2');
+
     function newGame() {
         Gameboard.resetBoard();
         Players.resetScore();
 
-        let sign = 'X';
+        let currentTurn = 'X';
         let running = true;
 
         while (running) {
@@ -83,20 +97,31 @@ const Game = (function () {
             const playerChoiceX = prompt('x coordinate:');
             const playerChoiceY = prompt('y coordinate:');
 
-            Gameboard.board[playerChoiceX][playerChoiceY] = sign;
-
-            sign = sign === 'X' ? 'O' : 'X';
-
-            if (Gameboard.checkWin()) {
-                running = false;
+            if (Gameboard.board[playerChoiceX][playerChoiceY] !== '') {
+                continue;
             }
 
+            Gameboard.board[playerChoiceX][playerChoiceY] = currentTurn;
+
+            if (Gameboard.checkWin()) {
+                Players.addScore(currentTurn);
+
+                running = false;
+                break;
+            }
+
+            if (!Gameboard.board.flat().includes('')) {
+                alert('draw');
+
+                running = false;
+                break;
+            }
+
+            currentTurn = currentTurn === 'X' ? 'O' : 'X';
         }
     }
 
-    newGame();
-
-    return Gameboard.board;
+    return newGame;
 })();
 
 
