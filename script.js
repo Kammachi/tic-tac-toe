@@ -7,6 +7,54 @@ const Game = (function () {
             this.board = [['', '', ''], ['', '', ''], ['', '', '']];
         },
 
+        checkAvailability: function (squareId) {
+            return this.board.flat()[squareId] === '';
+        },
+
+        addSign: function(squareId, signToAdd) {
+            let boardFlat = this.board.flat();
+
+            boardFlat[squareId] = signToAdd;
+
+            let newBoard = [];
+            let newRow = [];
+
+            for (let i = 0; i < 9; i++) {
+
+                newRow.push(boardFlat[i]);
+
+                if ((i + 1) % 3 === 0) {
+                    newBoard.push(newRow);
+                    newRow = [];
+                }
+            }
+
+            this.board = newBoard;
+        },
+
+        render: function () {
+            const gameContainer = document.querySelector('.gameContainer');
+
+            let currentId = 0;
+
+            for (let row of this.board) {
+                for (let cell of row) {
+                    const oldSquare = document.querySelector('.gameSquare');
+                    gameContainer.removeChild(oldSquare);
+
+                    const gameSquare = document.createElement('div');
+                    
+                    gameSquare.id = currentId
+                    gameSquare.classList.add('gameSquare');
+                    gameSquare.textContent = cell;
+
+                    gameContainer.appendChild(gameSquare);
+
+                    currentId++;
+                }
+            }
+        },
+
         checkWin: function() {
             board = this.board;
 
@@ -38,21 +86,11 @@ const Game = (function () {
             return false;
         },
 
-        render: function () {
-            const gameContainer = document.querySelector('.gameContainer');
-
-            for (let row of this.board) {
-                for (let cell of row) {
-                    const gameSquare = document.createElement('div');
-                    
-                    gameSquare.classList.add('gameSquare');
-                    gameSquare.textContent = cell;
-
-                    gameContainer.appendChild(gameSquare);
-                }
-            }
-        },  
+        checkFull: function() {
+            return !this.board.flat().includes('');
+        }
     }
+
 
     const Players = {
         players: [],
@@ -78,50 +116,59 @@ const Game = (function () {
                     alert(`${player.name} wins`);
                 }
             }
-        },
+        }
     }
 
     Players.createPlayer('player1');
     Players.createPlayer('player2');
+
 
     function newGame() {
         Gameboard.resetBoard();
         Players.resetScore();
 
         let currentTurn = 'X';
-        let running = true;
 
-        while (running) {
-            // render()
+        function setListener() {
+            const gameSquares = document.querySelectorAll('.gameSquare');
 
-            const playerChoiceX = prompt('x coordinate:');
-            const playerChoiceY = prompt('y coordinate:');
+            gameSquares.forEach((square) => {
+                square.addEventListener('click', game)
+            });
+        }
 
-            if (Gameboard.board[playerChoiceX][playerChoiceY] !== '') {
-                continue;
+        setListener()
+
+        function game(event) {
+
+            if (!Gameboard.checkAvailability(event.target.id)) {
+                return;
             }
+            
+            Gameboard.addSign(event.target.id, currentTurn)
 
-            Gameboard.board[playerChoiceX][playerChoiceY] = currentTurn;
+            Gameboard.render()
 
             if (Gameboard.checkWin()) {
                 Players.addScore(currentTurn);
 
-                running = false;
-                break;
+                return;
             }
 
-            if (!Gameboard.board.flat().includes('')) {
+            if (Gameboard.checkFull()) {
                 alert('draw');
 
-                running = false;
-                break;
+                return;
             }
 
             currentTurn = currentTurn === 'X' ? 'O' : 'X';
+
+            setListener()            
         }
     }
 
-    return newGame;
+
+    return {newGame};
 })();
 
 
