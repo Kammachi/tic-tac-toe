@@ -5,6 +5,8 @@ const Game = (function () {
 
         resetBoard: function() {
             this.board = [['', '', ''], ['', '', ''], ['', '', '']];
+
+            this.render();
         },
 
         checkAvailability: function (squareId) {
@@ -44,7 +46,7 @@ const Game = (function () {
 
                     const gameSquare = document.createElement('div');
                     
-                    gameSquare.id = currentId
+                    gameSquare.id = currentId;
                     gameSquare.classList.add('gameSquare');
                     gameSquare.textContent = cell;
 
@@ -103,10 +105,28 @@ const Game = (function () {
             this.players.push({name, sign, score});
         },
 
+        changeName: function(event) {
+
+            const oldName = event.target.parentElement.querySelector('.name').textContent;
+            const newName = prompt('New name:');
+
+            if (!newName) {
+                return;
+            }
+
+            for (let player of Players.players) {
+                player.name = (player.name === oldName) ? newName : player.name;
+            }
+
+            Players.displayPlayers();
+        },
+
         resetScore: function() {
-            for (const player of this.players) {
+            for (let player of Players.players) {
                 player.score = 0;
             }
+
+            Players.displayPlayers();
         },
 
         addScore: function(sign) {
@@ -116,16 +136,42 @@ const Game = (function () {
                     alert(`${player.name} wins`);
                 }
             }
+
+            this.displayPlayers();
+        },
+
+        displayPlayers: function() {
+            for (const player of this.players) {
+                const playerContainer = document.getElementById(
+                `player${this.players.indexOf(player)+1}`);
+
+                const playerName = playerContainer.querySelector('.name');
+                const playerScore = playerContainer.querySelector('.score');
+
+                playerName.textContent = player.name;
+                playerScore.textContent = player.score;
+            }
         }
     }
 
-    Players.createPlayer('player1');
-    Players.createPlayer('player2');
+
+    Players.createPlayer('Player 1');
+    Players.createPlayer('Player 2');
+
+    const changeButtons = document.querySelectorAll('.changeButton');
+    changeButtons.forEach((button) => {
+        button.addEventListener('click', Players.changeName);
+    });
+    
+    const newGameButton = document.querySelector('#newGame');
+    newGameButton.addEventListener('click', newGame);
+
+    const resetButton = document.querySelector('#resetButton');
+    resetButton.addEventListener('click', Players.resetScore);
 
 
     function newGame() {
         Gameboard.resetBoard();
-        Players.resetScore();
 
         let currentTurn = 'X';
 
@@ -133,21 +179,22 @@ const Game = (function () {
             const gameSquares = document.querySelectorAll('.gameSquare');
 
             gameSquares.forEach((square) => {
-                square.addEventListener('click', game)
+                square.addEventListener('click', gameLoop);
             });
         }
 
-        setListener()
+        setListener();
 
-        function game(event) {
+
+        function gameLoop(event) {
 
             if (!Gameboard.checkAvailability(event.target.id)) {
                 return;
             }
             
-            Gameboard.addSign(event.target.id, currentTurn)
+            Gameboard.addSign(event.target.id, currentTurn);
 
-            Gameboard.render()
+            Gameboard.render();
 
             if (Gameboard.checkWin()) {
                 Players.addScore(currentTurn);
@@ -163,7 +210,7 @@ const Game = (function () {
 
             currentTurn = currentTurn === 'X' ? 'O' : 'X';
 
-            setListener()            
+            setListener();       
         }
     }
 
