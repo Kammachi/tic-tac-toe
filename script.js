@@ -130,14 +130,24 @@ const Game = (function () {
         },
 
         addScore: function(sign) {
-            for (let player of this.players) {
-                if (player.sign === sign) {
-                    player.score++;
-                    alert(`${player.name} wins`);
-                }
-            }
+            let winner = this.players.filter((player) => player.sign === sign)[0];
+
+            winner.score++;
 
             this.displayPlayers();
+        },
+
+        displayWinner: function(sign) {
+            let winner = this.players.filter((player) => player.sign === sign)[0];
+
+            const messageContainer = dialog.querySelector('#messageContainer');
+
+            const message = !sign ? "Draw" : `${winner.name} wins!`;
+
+            messageContainer.textContent = message;
+
+            dialog.show();
+
         },
 
         displayPlayers: function() {
@@ -170,8 +180,11 @@ const Game = (function () {
     resetButton.addEventListener('click', Players.resetScore);
 
 
+    const dialog = document.querySelector('dialog');
+
     function newGame() {
         Gameboard.resetBoard();
+        dialog.close();
 
         let currentTurn = 'X';
 
@@ -198,12 +211,13 @@ const Game = (function () {
 
             if (Gameboard.checkWin()) {
                 Players.addScore(currentTurn);
+                Players.displayWinner(currentTurn);
 
                 return;
             }
 
             if (Gameboard.checkFull()) {
-                alert('draw');
+                Players.displayWinner();
 
                 return;
             }

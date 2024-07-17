@@ -82,6 +82,15 @@ h1 {
     background-color: rgb(200 200 200);
 }
 
+dialog {
+    position: absolute;
+    top: 400px;
+    
+    border-radius: 8px;
+
+    width: 200px;
+}
+
 .gameContainer {
     font-family: chalkBoard2;
 
